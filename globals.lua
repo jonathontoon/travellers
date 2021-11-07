@@ -2,17 +2,46 @@
     globals
 ]]--
 
-sze=128
-mrg=9
+size = 128
+margin = 0
 
-num_dts=15
-spc=14
-rad=4
+number_of_dots = 16
+spacing = 8
+radius = 6
 
-clrs={0,7}
-dts={}
+color = {
+    black = 0,
+    dark_blue = 1,
+    dark_purple = 2,
+    dark_green = 3,
+    brown = 4,
+    dark_grey = 5,
+    light_grey = 6,
+    white = 7,
+    red = 8,
+    orange = 9,
+    yellow = 10,
+    green = 11,
+    blue = 12,
+    lavender = 13,
+    pink = 14,
+    light_peach = 15 
+}
 
-len=flr((sze-mrg*2)/num_dts)
+dot_colors = {
+    color.white,
+    color.red,
+    color.orange,
+    color.yellow,
+    color.green,
+    color.blue,
+    color.pink
+}
 
-mv_from=nil
-mv_to=nil
+dots = {}
+
+length = flr((size * 2) / number_of_dots)
+
+origin_dot = nil
+destination_dot = nil
+last_dot = nil

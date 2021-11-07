@@ -2,79 +2,132 @@
     dots
 ]]--
 
+function make_dot(r, c, clr)
+    local x = c * (radius + spacing) + margin
+    local y = r * (radius + spacing) + margin
+    local clr = clr or dot_colors[flr(rnd(#dot_colors)) + 1]
+    return { row = r, column = c, x = x, y = y, dx = 0, dy = 0, rad = radius, clr = clr, moving = false }
+end
+
 function make_dots()
-	for r=0,len-1,1 do
-		dts[r]={}
-		for c=0,len-1,1 do
-			dts[r][c]=
-				clrs[flr(rnd(2))+1]
+	for row = 0, length - 1, 1 do
+		dots[row] = {}
+		for column = 0, length - 1, 1 do
+            local active = flr(rnd(2))
+            if active == 0 then
+                dots[row][column] = make_dot(row, column, color.black)
+            else
+                dots[row][column] = make_dot(row, column)
+            end
 		end 
 	end
 end
 
-function open_neighbors(r,c,len)
-	local nghbrs={}
+function open_neighbors(row, column)
+	local neighbors = {}
 	
-	local rstrt=max(r-1,0)
-	local rfnsh=min(r+1,len-1)
-	local cstrt=max(c-1,0)
-	local cfnsh=min(c+1,len-1)
+	local row_start = max(row - 1, 0)
+	local row_finish = min(row + 1, length - 1)
+	local column_start = max(column - 1, 0)
+	local column_finish = min(column + 1, length - 1)
 
-	for cr=rstrt,rfnsh,1 do
-		for cc=cstrt,cfnsh,1 do
-			if dts[cr][cc]==0 then
-				add(nghbrs,{
-					r=cr,
-					c=cc
-				})
+	for current_row = row_start, row_finish, 1 do
+		for current_column = column_start, column_finish, 1 do
+			if dots[current_row][current_column].clr == color.black then
+				add(neighbors, dots[current_row][current_column])
 			end
 		end
 	end
 
-	return nghbrs
+	return neighbors
 end
 
 function find_open_dots()
-	local opn_dts={}
+	local open_dots = {}
 	
-	for r=0,len-1,1 do
-		for c=0,len-1,1 do
+	for row = 0, length - 1, 1 do
+		for column = 0, length - 1, 1 do
 			
-			local nghbrs=
-				open_neighbors(r,c,len-1)
-	
-			local nghbr=
-				nghbrs[flr(rnd(#nghbrs))]
-	
-			if dts[r][c]==7
-			and nghbr then
-				add(opn_dts,{
-					{r=cr,c=cc},
-					nghbr
-				})
+			local neighbors = open_neighbors(row, column)
+			local picked_neighbor = neighbors[flr(rnd(#neighbors)) + 1]
+
+            if dots[row][column].clr != color.black and picked_neighbor != nil then
+				add(open_dots, { origin = dots[row][column], destination = picked_neighbor })
 			end
 			
 		end 
 	end
 	
-	return opn_dts
+	return open_dots
 end
 
-function get_open_dot()
-	local opn_dts=
-		find_open_dots()
-	local opn_dt=
-		opn_dts[flr(rnd(#opn_dts))]	
-	return opn_dt[1],opn_dt[2]
+function select_dots()
+	local open_dots_pair = find_open_dots()
+	local selected_pair = open_dots_pair[flr(rnd(#open_dots_pair)) + 1]
+    
+    if selected_pair.origin == last_dot then
+        selected_pair = open_dots_pair[flr(rnd(#open_dots_pair)) + 1]
+    end
+
+    origin_dot = selected_pair.origin
+    destination_dot = selected_pair.destination
+
+    dots[origin_dot.row][origin_dot.column].moving = true
+    dots[origin_dot.row][origin_dot.column].dx = destination_dot.x
+    dots[origin_dot.row][origin_dot.column].dy = destination_dot.y
+end
+
+function update_dots()
+    for row = 0, length - 1, 1 do
+		for column = 0, length - 1, 1 do
+            if dots[row][column].moving then
+                if dots[row][column].x < dots[row][column].dx then
+                    dots[row][column].x += 1
+                elseif dots[row][column].x > dots[row][column].dx then
+                    dots[row][column].x -= 1
+                end
+
+                if dots[row][column].y < dots[row][column].dy then
+                    dots[row][column].y += 1
+                elseif dots[row][column].y > dots[row][column].dy then
+                    dots[row][column].y -= 1
+                end
+
+                if dots[row][column].x == dots[row][column].dx
+                and dots[row][column].y == dots[row][column].dy then
+                    dots[row][column].moving = false
+                    dots[row][column].dx = 0
+                    dots[row][column].dy = 0
+
+                    dots[destination_dot.row][destination_dot.column] = make_dot(destination_dot.row, destination_dot.column, dots[row][column].clr)
+                    dots[row][column] = make_dot(row, column, color.black)
+                    
+                    last_dot = dots[destination_dot.row][destination_dot.column]
+
+                    origin_dot = nil
+                    destination_dot = nil
+                end
+            end
+		end 
+	end
+end
+
+function drawable_dots()
+    local drawable_dots = {}
+    for row = 0, length - 1, 1 do
+		for column = 0, length - 1, 1 do
+            if dots[row][column].clr != color.black then
+                add(drawable_dots, dots[row][column])
+            end
+		end 
+	end
+
+    return drawable_dots
 end
 
 function draw_dots()
-	for r=0,len-1,1 do
-		for c=0,len-1,1 do
-			local x=c*(rad+spc)+mrg
-			local y=r*(rad+spc)+mrg
-			local c=dts[r][c]
-			circ(x,y,rad,c)
-		end 
+	for dot in all(drawable_dots()) do
+        circfill(dot.x, dot.y, dot.rad, dot.clr)
+        circ(dot.x, dot.y, dot.rad, color.black)
 	end
 end

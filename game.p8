@@ -5,5 +5,3 @@ __lua__
 #include utilities.lua
 #include dots.lua
 #include main.lua
-__gfx__
-__map__
