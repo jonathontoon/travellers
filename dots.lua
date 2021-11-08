@@ -82,15 +82,15 @@ function update_dots()
 		for column = 0, length - 1, 1 do
             if dots[row][column].moving then
                 if dots[row][column].x < dots[row][column].dx then
-                    dots[row][column].x += 1
+                    dots[row][column].x += 2
                 elseif dots[row][column].x > dots[row][column].dx then
-                    dots[row][column].x -= 1
+                    dots[row][column].x -= 2
                 end
 
                 if dots[row][column].y < dots[row][column].dy then
-                    dots[row][column].y += 1
+                    dots[row][column].y += 2
                 elseif dots[row][column].y > dots[row][column].dy then
-                    dots[row][column].y -= 1
+                    dots[row][column].y -= 2
                 end
 
                 if dots[row][column].x == dots[row][column].dx

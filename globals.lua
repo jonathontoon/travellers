@@ -6,8 +6,8 @@ size = 128
 margin = 0
 
 number_of_dots = 16
-spacing = 8
-radius = 6
+spacing = 10
+radius = 8
 
 color = {
     black = 0,
@@ -40,7 +40,7 @@ dot_colors = {
 
 dots = {}
 
-length = flr((size * 2) / number_of_dots)
+length = flr(size / number_of_dots)
 
 origin_dot = nil
 destination_dot = nil
